@@ -14,6 +14,7 @@ A fullstack web application for posting volleyball tournaments and allowing user
 ## Tech Stack
 
 ### Backend
+
 - **Framework**: FastAPI
 - **Database**: SQLAlchemy + SQLite (or PostgreSQL)
 - **Authentication**: JWT (python-jose)
@@ -21,6 +22,7 @@ A fullstack web application for posting volleyball tournaments and allowing user
 - **Server**: Uvicorn
 
 ### Frontend
+
 - **Framework**: React 19 + TypeScript
 - **Build Tool**: Vite
 - **Routing**: React Router v6
@@ -67,6 +69,7 @@ PersonalProject/
 ### Backend Setup
 
 1. **Create Python Virtual Environment**
+
 ```bash
 cd backend
 python3 -m venv venv
@@ -74,19 +77,23 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
 2. **Install Dependencies**
+
 ```bash
 pip install -r requirements.txt
 ```
 
 3. **Configure Environment**
+
 ```bash
 cp .env.example .env
 ```
 
 4. **Run the Backend Server**
+
 ```bash
 python main.py
 ```
+
 The backend will run on `http://localhost:8000`
 
 **API Documentation**: http://localhost:8000/docs (Swagger UI)
@@ -94,28 +101,33 @@ The backend will run on `http://localhost:8000`
 ### Frontend Setup
 
 1. **Install Dependencies**
+
 ```bash
 cd frontend
 npm install
 ```
 
 2. **Configure Environment**
-The `.env` file is already set up to use `http://localhost:8000` as the API URL.
+   The `.env` file is already set up to use `http://localhost:8000` as the API URL.
 
 3. **Run the Development Server**
+
 ```bash
 npm run dev
 ```
+
 The frontend will run on `http://localhost:5173`
 
 ## API Endpoints
 
 ### Authentication
+
 - `POST /api/auth/register` - Register a new user
 - `POST /api/auth/login` - Login and get JWT token
 - `GET /api/auth/me` - Get current user info
 
 ### Tournaments
+
 - `GET /api/tournaments/` - List all tournaments
 - `GET /api/tournaments/{id}` - Get tournament details
 - `POST /api/tournaments/` - Create a new tournament (requires auth)
@@ -123,6 +135,7 @@ The frontend will run on `http://localhost:5173`
 - `DELETE /api/tournaments/{id}` - Delete tournament (requires auth, owner only)
 
 ### Registrations
+
 - `POST /api/registrations/` - Register for a tournament
 - `GET /api/registrations/{tournament_id}` - Get tournament registrations (tournament owner only)
 - `GET /api/registrations/user/my-registrations` - Get user's registrations
@@ -131,6 +144,7 @@ The frontend will run on `http://localhost:5173`
 ## Database Models
 
 ### User
+
 - id (primary key)
 - email (unique)
 - username (unique)
@@ -139,6 +153,7 @@ The frontend will run on `http://localhost:5173`
 - created_at
 
 ### Tournament
+
 - id (primary key)
 - name
 - description
@@ -152,6 +167,7 @@ The frontend will run on `http://localhost:5173`
 - created_by (foreign key to User)
 
 ### Registration
+
 - id (primary key)
 - user_id (foreign key)
 - tournament_id (foreign key)
@@ -188,16 +204,19 @@ The frontend will run on `http://localhost:5173`
 ## Troubleshooting
 
 ### Backend won't start
+
 - Ensure Python 3.8+ is installed
 - Check that virtual environment is activated
 - Verify all dependencies are installed: `pip install -r requirements.txt`
 
 ### Frontend won't connect to backend
+
 - Verify backend is running on port 8000
 - Check CORS settings in `backend/main.py`
 - Ensure `.env` has correct API URL: `VITE_API_URL=http://localhost:8000`
 
 ### Database errors
+
 - Delete `test.db` to reset database
 - Ensure database.py has correct DATABASE_URL
 
