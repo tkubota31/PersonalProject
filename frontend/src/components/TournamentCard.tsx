@@ -1,11 +1,13 @@
 import { Link } from "react-router-dom";
-import { Card, Tag, Button, Space } from "antd";
+import { Card, Tag, Button, Space, Typography } from "antd";
 import {
   CalendarOutlined,
   EnvironmentOutlined,
   TrophyOutlined,
   ArrowRightOutlined,
 } from "@ant-design/icons";
+
+const { Title, Text } = Typography;
 
 interface Tournament {
   id: number;
@@ -34,13 +36,14 @@ export default function TournamentCard({ tournament }: TournamentCardProps) {
     >
       <Card
         hoverable
+        color="primary"
         style={{
           height: "100%",
           borderRadius: "8px",
           border: "1px solid #f0f0f0",
           transition: "all 0.3s ease",
+          overflow: "hidden",
         }}
-        bodyStyle={{ padding: "24px" }}
         cover={
           <div
             style={{
@@ -49,7 +52,7 @@ export default function TournamentCard({ tournament }: TournamentCardProps) {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              padding: "16px",
+              margin: 0,
             }}
           >
             <TrophyOutlined
@@ -62,12 +65,10 @@ export default function TournamentCard({ tournament }: TournamentCardProps) {
         }
       >
         {/* Tournament Name */}
-        <h2
+        <Title
+          level={3}
           style={{
-            fontSize: "18px",
-            fontWeight: "600",
             marginBottom: "16px",
-            color: "#262626",
             display: "-webkit-box",
             WebkitLineClamp: 2,
             WebkitBoxOrient: "vertical",
@@ -75,11 +76,11 @@ export default function TournamentCard({ tournament }: TournamentCardProps) {
           }}
         >
           {tournament.name}
-        </h2>
+        </Title>
 
         {/* Details Section */}
         <Space
-          direction="vertical"
+          orientation="vertical"
           style={{
             width: "100%",
             marginBottom: "16px",
@@ -91,7 +92,6 @@ export default function TournamentCard({ tournament }: TournamentCardProps) {
               display: "flex",
               alignItems: "center",
               gap: "8px",
-              color: "#595959",
             }}
           >
             <CalendarOutlined
@@ -100,7 +100,7 @@ export default function TournamentCard({ tournament }: TournamentCardProps) {
                 color: "#1890ff",
               }}
             />
-            <span>{tournament.date}</span>
+            <Text>{tournament.date}</Text>
           </div>
 
           {/* Location */}
@@ -109,7 +109,6 @@ export default function TournamentCard({ tournament }: TournamentCardProps) {
               display: "flex",
               alignItems: "center",
               gap: "8px",
-              color: "#595959",
             }}
           >
             <EnvironmentOutlined
@@ -118,7 +117,7 @@ export default function TournamentCard({ tournament }: TournamentCardProps) {
                 color: "#faad14",
               }}
             />
-            <span>{tournament.location}</span>
+            <Text>{tournament.location}</Text>
           </div>
         </Space>
 
@@ -145,13 +144,8 @@ export default function TournamentCard({ tournament }: TournamentCardProps) {
           type="primary"
           block
           icon={<ArrowRightOutlined />}
-          iconPosition="end"
+          iconPlacement="end"
           size="large"
-          style={{
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            borderColor: "transparent",
-            marginTop: "12px",
-          }}
         >
           View Details
         </Button>
