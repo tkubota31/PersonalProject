@@ -1,6 +1,8 @@
-import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Form, Input, Button, Typography, message as antMessage } from "antd";
+
+const { Title } = Typography;
 
 interface RegistrationData {
   tournament: string;
@@ -13,72 +15,82 @@ interface RegistrationData {
 
 export default function RegisterTeam() {
   const { id } = useParams<{ id: string }>();
-  const [formData, setFormData] = useState<RegistrationData>({
-    tournament: id || "",
-    team_name: "",
-    captain_name: "",
-    captain_email: "",
-    captain_phone: "",
-    notes: "",
-  });
-  const [message, setMessage] = useState("");
+  const navigate = useNavigate();
+  const [form] = Form.useForm();
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
+  const handleSubmit = (values: any) => {
+    const formData: RegistrationData = {
+      tournament: id || "",
+      ...values,
+    };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
     axios
       .post("http://127.0.0.1:8000/api/registrations/", formData)
-      .then(() => setMessage("Registration submitted!"))
-      .catch(() => setMessage("Error submitting registration."));
+      .then(() => {
+        antMessage.success("Registration submitted successfully!");
+        setTimeout(() => navigate(`/tournaments/${id}`), 1500);
+      })
+      .catch(() => {
+        antMessage.error("Error submitting registration. Please try again.");
+      });
   };
 
   return (
-    <div className="p-4 max-w-md mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Register Your Team</h1>
-      {message && <p className="mb-4">{message}</p>}
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {[
-          "team_name",
-          "captain_name",
-          "captain_email",
-          "captain_phone",
-          "notes",
-        ].map((field) => (
-          <div key={field}>
-            <label className="block mb-1 capitalize">
-              {field.replace("_", " ")}
-            </label>
-            {field === "notes" ? (
-              <textarea
-                name={field}
-                value={(formData as any)[field]}
-                onChange={handleChange}
-                className="w-full border p-2 rounded"
-              />
-            ) : (
-              <input
-                type={field.includes("email") ? "email" : "text"}
-                name={field}
-                value={(formData as any)[field]}
-                onChange={handleChange}
-                className="w-full border p-2 rounded"
-                required
-              />
-            )}
-          </div>
-        ))}
-        <button
-          type="submit"
-          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+    <div style={{ padding: "40px 20px", maxWidth: "600px", margin: "0 auto" }}>
+      <Title level={2}>Register Your Team</Title>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleSubmit}
+        style={{ marginTop: "20px" }}
+      >
+        <Form.Item
+          name="team_name"
+          label="Team Name"
+          rules={[{ required: true, message: "Please enter your team name" }]}
         >
-          Submit Registration
-        </button>
-      </form>
+          <Input placeholder="Enter team name" size="large" />
+        </Form.Item>
+
+        <Form.Item
+          name="captain_name"
+          label="Captain Name"
+          rules={[{ required: true, message: "Please enter captain name" }]}
+        >
+          <Input placeholder="Enter captain name" size="large" />
+        </Form.Item>
+
+        <Form.Item
+          name="captain_email"
+          label="Captain Email"
+          rules={[
+            { required: true, message: "Please enter captain email" },
+            { type: "email", message: "Please enter a valid email" },
+          ]}
+        >
+          <Input placeholder="Enter captain email" size="large" type="email" />
+        </Form.Item>
+
+        <Form.Item
+          name="captain_phone"
+          label="Captain Phone"
+          rules={[
+            { required: true, message: "Please enter captain phone number" },
+          ]}
+        >
+          <Input placeholder="Enter captain phone number" size="large" />
+        </Form.Item>
+
+        <Form.Item name="notes" label="Additional Notes (Optional)">
+          <Input.TextArea placeholder="Enter any additional notes" rows={4} />
+        </Form.Item>
+
+        <Form.Item>
+          <Button type="primary" size="large" block htmlType="submit">
+            Submit Registration
+          </Button>
+        </Form.Item>
+      </Form>
     </div>
   );
 }
