@@ -39,13 +39,12 @@ export default function TournamentList() {
       style={{
         background: "#f5f5f5",
         minHeight: "100vh",
-        padding: "48px 24px",
       }}
     >
       <div>
         {/* Header Section */}
         <div style={{ marginBottom: "40px" }}>
-          <Space direction="vertical" style={{ width: "100%" }}>
+          <Space orientation="vertical" style={{ width: "100%" }}>
             <Space style={{ alignItems: "center" }}>
               <TrophyOutlined style={{ fontSize: "32px", color: "#1890ff" }} />
               <Title level={1} style={{ margin: 0 }}>

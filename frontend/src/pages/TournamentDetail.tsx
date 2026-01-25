@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
+import { Typography, Button, Spin, Divider, Empty } from "antd";
+
+const { Title, Text } = Typography;
 
 interface Tournament {
   id: number;
@@ -15,35 +18,60 @@ interface Tournament {
 export default function TournamentDetail() {
   const { id } = useParams<{ id: string }>();
   const [tournament, setTournament] = useState<Tournament | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!id) return;
+    setLoading(true);
     axios
       .get<Tournament>(`http://127.0.0.1:8000/api/tournaments/${id}/`)
       .then((res) => setTournament(res.data))
-      .catch((err) => console.error(err));
+      .catch((err) => console.error(err))
+      .finally(() => setLoading(false));
   }, [id]);
 
+  if (loading) return <Spin size="large" />;
   if (!tournament) return <p>Loading...</p>;
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold">{tournament.name}</h1>
-      <p>Date: {tournament.date}</p>
-      <p>Location: {tournament.location}</p>
-      <p>Skill Level: {tournament.skill_level}</p>
-      <p>Max Teams: {tournament.max_teams}</p>
-      <p>
-        Registration Deadline:{" "}
-        {new Date(tournament.registration_deadline).toLocaleString()}
-      </p>
-
-      <Link
-        to={`/register/${tournament.id}`}
-        className="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-      >
-        Register Team
+    <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
+      <Title level={2}>{tournament.name}</Title>
+      <Text strong>Date: </Text>
+      {tournament.date}
+      <br />
+      <Text strong>Location: </Text>
+      {tournament.location}
+      <br />
+      <Text strong>Skill Level: </Text>
+      {tournament.skill_level}
+      <br />
+      <Text strong>Max Teams: </Text>
+      {tournament.max_teams}
+      <br />
+      <Text strong>Registration Deadline: </Text>
+      {new Date(tournament.registration_deadline).toLocaleString()}
+      <br />
+      <Link to={`/register/${tournament.id}`}>
+        <Button type="primary" style={{ marginTop: 16 }} size="large" block>
+          Register Team
+        </Button>
       </Link>
+
+      <Divider />
+
+      <Title level={3}>Teams Registered</Title>
+      <Empty
+        description="Teams list coming soon"
+        style={{ marginTop: "20px", marginBottom: "20px" }}
+      />
+
+      <Divider />
+
+      <Title level={3}>Tournament Policy</Title>
+      <Empty
+        description="Tournament policy details coming soon"
+        style={{ marginTop: "20px", marginBottom: "20px" }}
+      />
     </div>
   );
 }
