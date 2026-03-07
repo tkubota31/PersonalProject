@@ -12,3 +12,11 @@ class TournamentDetailView(generics.RetrieveAPIView):
 
 class TeamRegistrationCreateView(generics.CreateAPIView):
     serializer_class = TeamRegistrationSerializer
+
+
+class TournamentRegistrationsView(generics.ListAPIView):
+    serializer_class = TeamRegistrationSerializer
+
+    def get_queryset(self):
+        tournament_id = self.kwargs['tournament_id']
+        return TeamRegistration.objects.filter(tournament_id=tournament_id, status='CONFIRMED')

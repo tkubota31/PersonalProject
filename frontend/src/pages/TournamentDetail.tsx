@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { Typography, Button, Spin, Divider, Empty } from "antd";
+import RegisteredTeams from "../components/RegisteredTeams";
 
 const { Title, Text } = Typography;
 
@@ -15,9 +16,21 @@ interface Tournament {
   registration_deadline: string;
 }
 
+interface Registration {
+  id: string;
+  team_name: string;
+  captain_name: string;
+  captain_email: string;
+  captain_phone: string;
+  notes: string;
+  status: string;
+  created_at: string;
+}
+
 export default function TournamentDetail() {
   const { id } = useParams<{ id: string }>();
   const [tournament, setTournament] = useState<Tournament | null>(null);
+  const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,7 +38,16 @@ export default function TournamentDetail() {
     setLoading(true);
     axios
       .get<Tournament>(`http://127.0.0.1:8000/api/tournaments/${id}/`)
-      .then((res) => setTournament(res.data))
+      .then((res) => {
+        setTournament(res.data);
+        // Fetch registrations after tournament is loaded
+        return axios.get<Registration[]>(
+          `http://127.0.0.1:8000/api/tournaments/${id}/registrations/`,
+        );
+      })
+      .then((res) => {
+        setRegistrations(res.data);
+      })
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
   }, [id]);
@@ -60,10 +82,7 @@ export default function TournamentDetail() {
       <Divider />
 
       <Title level={3}>Teams Registered</Title>
-      <Empty
-        description="Teams list coming soon"
-        style={{ marginTop: "20px", marginBottom: "20px" }}
-      />
+      <RegisteredTeams registrations={registrations} />
 
       <Divider />
 
