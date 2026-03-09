@@ -15,11 +15,11 @@ A fullstack web application for posting volleyball tournaments and allowing user
 
 ### Backend
 
-- **Framework**: FastAPI
-- **Database**: SQLAlchemy + SQLite (or PostgreSQL)
-- **Authentication**: JWT (python-jose)
-- **Password Hashing**: bcrypt
-- **Server**: Uvicorn
+- **Framework**: Django 4.x with Django REST Framework
+- **Database**: Django ORM (SQLite by default, can switch to PostgreSQL)
+- **Authentication**: Django's built-in auth (extendable) and DRF token/session auth
+- **Password Hashing**: Django's default password hasher
+- **Server**: Run via `manage.py runserver` or WSGI/ASGI server
 
 ### Frontend
 
@@ -33,26 +33,30 @@ A fullstack web application for posting volleyball tournaments and allowing user
 
 ```
 PersonalProject/
-├── backend/
-│   ├── main.py              # FastAPI application entry point
-│   ├── database.py          # Database configuration
-│   ├── models.py            # SQLAlchemy models
-│   ├── schemas.py           # Pydantic validation schemas
-│   ├── security.py          # Authentication & hashing utilities
-│   ├── routes_auth.py       # Authentication endpoints
-│   ├── routes_tournaments.py# Tournament management endpoints
-│   ├── routes_registrations.py # Registration endpoints
-│   ├── requirements.txt      # Python dependencies
-│   └── .env.example         # Environment variables template
-│
+├── backend/                     # Django project root
+│   ├── manage.py                # Django CLI entry point
+│   ├── config/                  # Django project configuration (formerly 'backend')
+│   │   ├── settings.py
+│   │   ├── urls.py
+│   │   ├── wsgi.py
+│   │   └── asgi.py
+│   ├── tournaments/             # Django app for tournament logic
+│   │   ├── models.py
+│   │   ├── views.py
+│   │   ├── serializers.py
+│   │   ├── urls.py
+│   │   ├── admin.py
+│   │   └── tests.py
+│   ├── db.sqlite3               # SQLite database (development)
+│   └── requirements.txt         # Python dependencies (if present)
 └── frontend/
     ├── src/
-    │   ├── main.tsx         # React entry point
-    │   ├── App.tsx          # Main app with routing
+    │   ├── main.tsx             # React entry point
+    │   ├── App.tsx              # Main app with routing
     │   ├── api/
-    │   │   └── client.ts    # API client with axios
+    │   │   └── client.ts        # API client with axios
     │   ├── context/
-    │   │   └── AuthContext.tsx # Auth context (for future use)
+    │   │   └── AuthContext.tsx  # Auth context (for future use)
     │   └── pages/
     │       ├── LoginPage.tsx
     │       ├── RegisterPage.tsx
@@ -61,7 +65,7 @@ PersonalProject/
     ├── vite.config.ts
     ├── tsconfig.json
     ├── package.json
-    └── .env              # Environment variables
+    └── .env                    # Environment variables
 ```
 
 ## Setup Instructions
@@ -79,24 +83,31 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 2. **Install Dependencies**
 
 ```bash
-pip install -r requirements.txt
+pip install django djangorestframework django-cors-headers
+# or install from requirements.txt if available
 ```
 
-3. **Configure Environment**
+3. **Apply Migrations**
 
 ```bash
-cp .env.example .env
+python manage.py migrate
 ```
 
 4. **Run the Backend Server**
 
 ```bash
-python main.py
+python manage.py runserver
 ```
 
-The backend will run on `http://localhost:8000`
+The backend will run on `http://localhost:8000`. API endpoints are under `/api/` and use standard Django routing.
 
-**API Documentation**: http://localhost:8000/docs (Swagger UI)
+(Optional) You can create a superuser to access the admin panel:
+
+```bash
+python manage.py createsuperuser
+```
+
+The admin interface will be available at `http://localhost:8000/admin/`.
 
 ### Frontend Setup
 
@@ -120,26 +131,18 @@ The frontend will run on `http://localhost:5173`
 
 ## API Endpoints
 
-### Authentication
-
-- `POST /api/auth/register` - Register a new user
-- `POST /api/auth/login` - Login and get JWT token
-- `GET /api/auth/me` - Get current user info
-
 ### Tournaments
 
-- `GET /api/tournaments/` - List all tournaments
-- `GET /api/tournaments/{id}` - Get tournament details
-- `POST /api/tournaments/` - Create a new tournament (requires auth)
-- `PUT /api/tournaments/{id}` - Update tournament (requires auth, owner only)
-- `DELETE /api/tournaments/{id}` - Delete tournament (requires auth, owner only)
+- `GET /api/tournaments/` - List open tournaments
+- `GET /api/tournaments/{id}` - Retrieve tournament details
+- `POST /api/tournaments/` - Create a new tournament (optional auth)
+- `PUT /api/tournaments/{id}` - Update tournament (optional auth)
+- `DELETE /api/tournaments/{id}` - Delete tournament (optional auth)
 
 ### Registrations
 
-- `POST /api/registrations/` - Register for a tournament
-- `GET /api/registrations/{tournament_id}` - Get tournament registrations (tournament owner only)
-- `GET /api/registrations/user/my-registrations` - Get user's registrations
-- `DELETE /api/registrations/{id}` - Cancel registration
+- `POST /api/registrations/` - Register a team for a tournament (optional auth)
+- `GET /api/tournaments/{id}/registrations/` - List confirmed registrations for a tournament
 
 ## Database Models
 

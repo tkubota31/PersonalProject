@@ -1,5 +1,6 @@
-import uuid
 from django.db import models
+from django.contrib.auth.models import User
+from django.utils import timezone
 
 
 class Tournament(models.Model):
@@ -12,46 +13,37 @@ class Tournament(models.Model):
         ("B+", "B+"),
     ]
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=200)
-    date = models.DateField()
+    description = models.TextField(blank=True)
     location = models.CharField(max_length=200)
-    skill_level = models.CharField(
-        max_length=2,
-        choices=SKILL_LEVELS,
-    )
+    date = models.DateField()
+    skill_level = models.CharField(max_length=2, choices=SKILL_LEVELS, default="C")
     max_teams = models.PositiveIntegerField()
     registration_deadline = models.DateTimeField()
+    fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    created_at = models.DateTimeField(default=timezone.now)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     is_open = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.name} ({self.skill_level})"
+        return self.name
 
 
-class TeamRegistration(models.Model):
+class Registration(models.Model):
     STATUS_CHOICES = [
-        ("PENDING", "Pending"),
-        ("CONFIRMED", "Confirmed"),
-        ("WAITLIST", "Waitlist"),
+        ("pending", "Pending"),
+        ("confirmed", "Confirmed"),
+        ("cancelled", "Cancelled"),
     ]
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    tournament = models.ForeignKey(
-        Tournament,
-        related_name="registrations",
-        on_delete=models.CASCADE,
-    )
+    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name="registrations")
     team_name = models.CharField(max_length=100)
     captain_name = models.CharField(max_length=100)
     captain_email = models.EmailField()
     captain_phone = models.CharField(max_length=20)
     notes = models.TextField(blank=True)
-    status = models.CharField(
-        max_length=20,
-        choices=STATUS_CHOICES,
-        default="PENDING",
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
+    created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return f"{self.team_name} - {self.tournament.name}"
