@@ -1,6 +1,8 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { Form, Input, Button, Typography, message as antMessage } from "antd";
+import { Link } from "react-router-dom";
 import apiClient from "../api/client";
+import { useAuth } from "../context/AuthContext";
 
 const { Title } = Typography;
 
@@ -17,6 +19,36 @@ export default function RegisterTeam() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [form] = Form.useForm();
+  const { isAuthenticated } = useAuth();
+
+  if (!isAuthenticated) {
+    return (
+      <div
+        style={{
+          padding: "40px 20px",
+          maxWidth: "600px",
+          margin: "0 auto",
+          textAlign: "center",
+        }}
+      >
+        <Title level={2}>Register Your Team</Title>
+        <Typography.Paragraph>
+          You must be logged in to register a team. Please sign in or register
+          first.
+        </Typography.Paragraph>
+        <div style={{ marginTop: "20px" }}>
+          <Link to="/login">
+            <Button type="primary" size="large" style={{ marginRight: "10px" }}>
+              Sign In
+            </Button>
+          </Link>
+          <Link to="/register">
+            <Button size="large">Register</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   const handleSubmit = (values: any) => {
     const formData: RegistrationData = {
