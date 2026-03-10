@@ -2,6 +2,7 @@ from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 from .views import (
     TournamentListView, TournamentDetailView, RegistrationCreateView,
+    RegistrationDetailView, MyRegistrationsView,
     TournamentRegistrationsView, RegisterView, LoginView
 )
 
@@ -18,4 +19,6 @@ urlpatterns = [
 
     # Registration endpoints
     path("registrations/", RegistrationCreateView.as_view(), name='registration-create'),
+    path("registrations/<int:pk>/", RegistrationDetailView.as_view(), name='registration-detail'),
+    path("registrations/my/", MyRegistrationsView.as_view(), name='my-registrations'),
 ]

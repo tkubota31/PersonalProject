@@ -1,6 +1,6 @@
 from rest_framework import generics, status
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny, IsAuthenticated, BasePermission
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
@@ -8,9 +8,20 @@ from django.shortcuts import get_object_or_404
 from .models import Tournament, Registration
 from .serializers import (
     TournamentSerializer, TournamentCreateSerializer, TournamentUpdateSerializer,
-    RegistrationSerializer, RegistrationCreateSerializer,
+    RegistrationSerializer, RegistrationCreateSerializer, RegistrationUpdateSerializer,
     UserRegisterSerializer, UserLoginSerializer, UserSerializer
 )
+
+
+class IsRegistrationOwnerOrReadOnly(BasePermission):
+    """Permission to allow registration owner to edit/delete, read-only for others."""
+    
+    def has_object_permission(self, request, view, obj):
+        # Read permissions are allowed to any access
+        if request.method in ['GET', 'HEAD', 'OPTIONS']:
+            return True
+        # Write permissions are only allowed to the owner
+        return obj.user == request.user or request.user.is_staff
 
 
 class TournamentListView(generics.ListCreateAPIView):
@@ -38,9 +49,32 @@ class TournamentDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 class RegistrationCreateView(generics.CreateAPIView):
     serializer_class = RegistrationCreateSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):
-        serializer.save()
+        serializer.save(user=self.request.user if self.request.user.is_authenticated else None)
+
+
+class RegistrationDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Registration.objects.all()
+    permission_classes = [IsRegistrationOwnerOrReadOnly]
+
+    def get_serializer_class(self):
+        if self.request.method in ['PUT', 'PATCH']:
+            return RegistrationUpdateSerializer
+        return RegistrationSerializer
+
+
+class MyRegistrationsView(generics.ListAPIView):
+    serializer_class = RegistrationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = Registration.objects.filter(user=self.request.user)
+        tournament_id = self.request.query_params.get('tournament')
+        if tournament_id:
+            queryset = queryset.filter(tournament_id=tournament_id)
+        return queryset
 
 
 class TournamentRegistrationsView(generics.ListAPIView):

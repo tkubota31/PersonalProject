@@ -48,3 +48,13 @@ class Registration(models.Model):
 
     def __str__(self):
         return f"{self.team_name} - {self.tournament.name}"
+
+
+class TeamMember(models.Model):
+    registration = models.ForeignKey(Registration, on_delete=models.CASCADE, related_name="team_members")
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    is_captain = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.name} ({self.registration.team_name})"

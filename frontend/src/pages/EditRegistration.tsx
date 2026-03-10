@@ -1,7 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { Form, Input, Button, Typography, message as antMessage, Space, Checkbox, Empty } from "antd";
+import { Form, Input, Button, Typography, message as antMessage, Spin, Checkbox, Empty } from "antd";
 import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
-import { Link } from "react-router-dom";
 import apiClient from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import { useEffect, useState } from "react";
@@ -14,122 +13,109 @@ interface TeamMember {
   is_captain: boolean;
 }
 
-interface RegistrationData {
-  tournament: string;
-  team_name: string;
-  captain_name: string;
-  captain_email: string;
-  captain_phone: string;
-  notes?: string;
-  team_members?: TeamMember[];
-}
-
-interface ExistingRegistration {
+interface Registration {
   id: number;
+  tournament: number;
   team_name: string;
   captain_name: string;
   captain_email: string;
   captain_phone: string;
   notes: string;
   team_members: TeamMember[];
+  status: string;
+  created_at: string;
 }
 
-export default function RegisterTeam() {
+export default function EditRegistration() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const { isAuthenticated } = useAuth();
-  const [existingRegistration, setExistingRegistration] = useState<ExistingRegistration | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [registration, setRegistration] = useState<Registration | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (isAuthenticated && id) {
-      setLoading(true);
-      apiClient
-        .get(`/registrations/my/?tournament=${id}`)
-        .then((res) => {
-          if (res.data && res.data.length > 0) {
-            setExistingRegistration(res.data[0]);
-          }
-        })
-        .catch((err) => console.error(err))
-        .finally(() => setLoading(false));
+    if (!isAuthenticated || !id) {
+      navigate("/login");
+      return;
     }
-  }, [isAuthenticated, id]);
 
-  if (!isAuthenticated) {
-    return (
-      <div
-        style={{
-          padding: "40px 20px",
-          maxWidth: "600px",
-          margin: "0 auto",
-          textAlign: "center",
-        }}
-      >
-        <Title level={2}>Register Your Team</Title>
-        <Typography.Paragraph>
-          You must be logged in to register a team. Please sign in or register
-          first.
-        </Typography.Paragraph>
-        <div style={{ marginTop: "20px" }}>
-          <Link to="/login">
-            <Button type="primary" size="large" style={{ marginRight: "10px" }}>
-              Sign In
-            </Button>
-          </Link>
-          <Link to="/register">
-            <Button size="large">Register</Button>
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  if (existingRegistration) {
-    return (
-      <div style={{ padding: "40px 20px", maxWidth: "600px", margin: "0 auto" }}>
-        <Title level={2}>Your Registration</Title>
-        <Typography.Paragraph>
-          You have already registered for this tournament.
-        </Typography.Paragraph>
-        <Button
-          type="primary"
-          size="large"
-          onClick={() => navigate(`/registrations/${existingRegistration.id}/edit`)}
-          style={{ marginRight: "10px" }}
-        >
-          Edit Registration
-        </Button>
-        <Button size="large" onClick={() => navigate(`/tournaments/${id}`)}>
-          Back to Tournament
-        </Button>
-      </div>
-    );
-  }
-
-  const handleSubmit = (values: any) => {
-    const formData: RegistrationData = {
-      tournament: id || "",
-      team_members: values.team_members || [],
-      ...values,
-    };
-
+    setLoading(true);
     apiClient
-      .post("/registrations/", formData)
-      .then(() => {
-        antMessage.success("Registration submitted successfully!");
-        setTimeout(() => navigate(`/tournaments/${id}`), 1500);
+      .get(`/registrations/${id}/`)
+      .then((res) => {
+        setRegistration(res.data);
+        form.setFieldsValue({
+          team_name: res.data.team_name,
+          captain_name: res.data.captain_name,
+          captain_email: res.data.captain_email,
+          captain_phone: res.data.captain_phone,
+          notes: res.data.notes,
+          team_members: res.data.team_members.map((member: TeamMember) => ({
+            name: member.name,
+            email: member.email,
+            is_captain: member.is_captain,
+          })),
+        });
       })
       .catch((err) => {
-        const errorMsg = err.response?.data?.detail || "Error submitting registration. Please try again.";
+        const errorMsg = err.response?.status === 403 ? "You don't have permission to edit this registration." : "Error loading registration.";
         antMessage.error(errorMsg);
-      });
+        navigate("/");
+      })
+      .finally(() => setLoading(false));
+  }, [isAuthenticated, id, navigate, form]);
+
+  const handleSubmit = (values: any) => {
+    setSubmitting(true);
+
+    apiClient
+      .patch(`/registrations/${id}/`, {
+        team_name: values.team_name,
+        captain_name: values.captain_name,
+        captain_email: values.captain_email,
+        captain_phone: values.captain_phone,
+        notes: values.notes,
+        team_members: values.team_members || [],
+      })
+      .then(() => {
+        antMessage.success("Registration updated successfully!");
+        setTimeout(() => {
+          if (registration) {
+            navigate(`/tournaments/${registration.tournament}`);
+          }
+        }, 1500);
+      })
+      .catch((err) => {
+        const errorMsg = err.response?.data?.detail || "Error updating registration. Please try again.";
+        antMessage.error(errorMsg);
+      })
+      .finally(() => setSubmitting(false));
   };
+
+  if (loading) {
+    return (
+      <div style={{ padding: "40px 20px", textAlign: "center" }}>
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  if (!registration) {
+    return (
+      <div style={{ padding: "40px 20px", maxWidth: "600px", margin: "0 auto", textAlign: "center" }}>
+        <Title level={2}>Registration Not Found</Title>
+        <Button type="primary" onClick={() => navigate("/")}>
+          Back to Tournaments
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div style={{ padding: "40px 20px", maxWidth: "600px", margin: "0 auto" }}>
-      <Title level={2}>Register Your Team</Title>
+      <Title level={2}>Edit Team Registration</Title>
       <Form
         form={form}
         layout="vertical"
@@ -256,8 +242,14 @@ export default function RegisterTeam() {
         </Form.Item>
 
         <Form.Item>
-          <Button type="primary" size="large" block htmlType="submit">
-            Submit Registration
+          <Button 
+            type="primary" 
+            size="large" 
+            block 
+            htmlType="submit"
+            loading={submitting}
+          >
+            Save Changes
           </Button>
         </Form.Item>
       </Form>
