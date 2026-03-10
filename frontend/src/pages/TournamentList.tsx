@@ -10,19 +10,13 @@ import {
   Typography,
   Layout,
 } from "antd";
-import {
-  TrophyOutlined,
-  LogoutOutlined,
-  LoginOutlined,
-  UserAddOutlined,
-} from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
+import { TrophyOutlined } from "@ant-design/icons";
 import TournamentCard from "../components/TournamentCard";
-import { useAuth } from "../context/AuthContext";
+import NavigationBanner from "../components/NavigationBanner";
 import apiClient from "../api/client";
 
 const { Title, Text } = Typography;
-const { Header, Content } = Layout;
+const { Content } = Layout;
 
 interface Tournament {
   id: number;
@@ -36,8 +30,6 @@ export default function TournamentList() {
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { user, isAuthenticated, logout } = useAuth();
-  const navigate = useNavigate();
 
   useEffect(() => {
     setLoading(true);
@@ -54,58 +46,9 @@ export default function TournamentList() {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleLogout = () => {
-    logout();
-    navigate("/");
-  };
-
   return (
     <Layout style={{ minHeight: "100vh" }}>
-      <Header
-        style={{
-          background: "#fff",
-          padding: "0 24px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-        }}
-      >
-        <Title level={3} style={{ margin: 0 }}>
-          Volleyball Tournaments
-        </Title>
-        <Space>
-          {isAuthenticated ? (
-            <>
-              <Text>Welcome, {user?.username}!</Text>
-              <Button
-                type="primary"
-                danger
-                icon={<LogoutOutlined />}
-                onClick={handleLogout}
-              >
-                Logout
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button
-                type="primary"
-                icon={<LoginOutlined />}
-                onClick={() => navigate("/login")}
-              >
-                Login
-              </Button>
-              <Button
-                icon={<UserAddOutlined />}
-                onClick={() => navigate("/register")}
-              >
-                Register
-              </Button>
-            </>
-          )}
-        </Space>
-      </Header>
+      <NavigationBanner />
       <Content
         style={{
           background: "#f5f5f5",

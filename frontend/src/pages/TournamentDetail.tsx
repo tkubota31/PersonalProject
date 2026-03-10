@@ -84,6 +84,9 @@ export default function TournamentDetail() {
 
   return (
     <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
+      <Link to="/">
+        <Button style={{ marginBottom: 16 }}>← Back to Tournaments</Button>
+      </Link>
       <Title level={2}>{tournament.name}</Title>
       <Text strong>Date: </Text>
       {tournament.date}

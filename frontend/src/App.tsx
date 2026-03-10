@@ -5,6 +5,8 @@ import RegisterTeam from "./pages/RegisterTeam.tsx";
 import EditRegistration from "./pages/EditRegistration.tsx";
 import Login from "./pages/Login.tsx";
 import Register from "./pages/Register.tsx";
+import AboutUs from "./pages/AboutUs.tsx";
+import Contact from "./pages/Contact.tsx";
 import { ConfigProvider } from "antd";
 import { AuthProvider } from "./context/AuthContext.tsx";
 
@@ -28,6 +30,8 @@ function App() {
             />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/about" element={<AboutUs />} />
+            <Route path="/contact" element={<Contact />} />
           </Routes>
         </Router>
       </AuthProvider>
