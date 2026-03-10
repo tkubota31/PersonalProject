@@ -22,7 +22,7 @@ class Tournament(models.Model):
     registration_deadline = models.DateTimeField()
     fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     created_at = models.DateTimeField(default=timezone.now)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     is_open = models.BooleanField(default=True)
 
     def __str__(self):
@@ -37,6 +37,7 @@ class Registration(models.Model):
     ]
 
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name="registrations")
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     team_name = models.CharField(max_length=100)
     captain_name = models.CharField(max_length=100)
     captain_email = models.EmailField()

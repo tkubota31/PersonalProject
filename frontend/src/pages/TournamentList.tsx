@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
-import { Row, Col, Card, Empty, Spin, Space, Button, Typography } from "antd";
-import { TrophyOutlined } from "@ant-design/icons";
+import { Row, Col, Card, Empty, Spin, Space, Button, Typography, Layout } from "antd";
+import { TrophyOutlined, LogoutOutlined, LoginOutlined, UserAddOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 import TournamentCard from "../components/TournamentCard";
+import { useAuth } from "../context/AuthContext";
+import apiClient from "../api/client";
 
 const { Title, Text } = Typography;
+const { Header, Content } = Layout;
 
 interface Tournament {
   id: number;
@@ -18,11 +21,13 @@ export default function TournamentList() {
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { user, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     setLoading(true);
-    axios
-      .get<Tournament[]>("http://127.0.0.1:8000/api/tournaments/")
+    apiClient
+      .get<Tournament[]>("/tournaments/")
       .then((res) => {
         setTournaments(res.data);
         setError(null);
@@ -34,63 +39,116 @@ export default function TournamentList() {
       .finally(() => setLoading(false));
   }, []);
 
-  return (
-    <div
-      style={{
-        background: "#f5f5f5",
-        minHeight: "100vh",
-      }}
-    >
-      <div>
-        {/* Header Section */}
-        <div style={{ marginBottom: "40px" }}>
-          <Space orientation="vertical" style={{ width: "100%" }}>
-            <Space style={{ alignItems: "center" }}>
-              <TrophyOutlined style={{ fontSize: "32px", color: "#1890ff" }} />
-              <Title level={1} style={{ margin: 0 }}>
-                Upcoming Volleyball Tournaments
-              </Title>
-            </Space>
-            <Text type="secondary" style={{ fontSize: "16px" }}>
-              Discover and join exciting volleyball tournaments in your area
-            </Text>
-          </Space>
-        </div>
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
-        {/* Content Section */}
-        <Spin spinning={loading} size="large">
-          {error ? (
-            <Card style={{ textAlign: "center", padding: "48px" }}>
-              <p style={{ color: "#ff4d4f", fontSize: "16px" }}>{error}</p>
+  return (
+    <Layout style={{ minHeight: "100vh" }}>
+      <Header
+        style={{
+          background: "#fff",
+          padding: "0 24px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+        }}
+      >
+        <Title level={3} style={{ margin: 0 }}>
+          Volleyball Tournaments
+        </Title>
+        <Space>
+          {isAuthenticated ? (
+            <>
+              <Text>Welcome, {user?.username}!</Text>
               <Button
                 type="primary"
-                onClick={() => window.location.reload()}
-                style={{ marginTop: "16px" }}
+                danger
+                icon={<LogoutOutlined />}
+                onClick={handleLogout}
               >
-                Retry
+                Logout
               </Button>
-            </Card>
-          ) : tournaments.length === 0 ? (
-            <Card style={{ textAlign: "center", padding: "48px" }}>
-              <Empty
-                description="No tournaments available"
-                style={{ marginBottom: "24px" }}
-              />
-              <Text type="secondary">
-                Check back soon for upcoming tournaments!
-              </Text>
-            </Card>
+            </>
           ) : (
-            <Row gutter={[24, 24]}>
-              {tournaments.map((tournament) => (
-                <Col key={tournament.id} xs={24} sm={24} md={12} lg={8}>
-                  <TournamentCard tournament={tournament} />
-                </Col>
-              ))}
-            </Row>
+            <>
+              <Button
+                type="primary"
+                icon={<LoginOutlined />}
+                onClick={() => navigate('/login')}
+              >
+                Login
+              </Button>
+              <Button
+                icon={<UserAddOutlined />}
+                onClick={() => navigate('/register')}
+              >
+                Register
+              </Button>
+            </>
           )}
-        </Spin>
-      </div>
-    </div>
+        </Space>
+      </Header>
+      <Content style={{ background: "#f5f5f5", padding: "24px", minHeight: "calc(100vh - 64px)" }}>
+        <div
+          style={{
+            background: "#f5f5f5",
+          }}
+        >
+          <div>
+            {/* Header Section */}
+            <div style={{ marginBottom: "40px" }}>
+              <Space orientation="vertical" style={{ width: "100%" }}>
+                <Space style={{ alignItems: "center" }}>
+                  <TrophyOutlined style={{ fontSize: "32px", color: "#1890ff" }} />
+                  <Title level={1} style={{ margin: 0 }}>
+                    Upcoming Volleyball Tournaments
+                  </Title>
+                </Space>
+                <Text type="secondary" style={{ fontSize: "16px" }}>
+                  Discover and join exciting volleyball tournaments in your area
+                </Text>
+              </Space>
+            </div>
+
+            {/* Content Section */}
+            <Spin spinning={loading} size="large">
+              {error ? (
+                <Card style={{ textAlign: "center", padding: "48px" }}>
+                  <p style={{ color: "#ff4d4f", fontSize: "16px" }}>{error}</p>
+                  <Button
+                    type="primary"
+                    onClick={() => window.location.reload()}
+                    style={{ marginTop: "16px" }}
+                  >
+                    Retry
+                  </Button>
+                </Card>
+              ) : tournaments.length === 0 ? (
+                <Card style={{ textAlign: "center", padding: "48px" }}>
+                  <Empty
+                    description="No tournaments available"
+                    style={{ marginBottom: "24px" }}
+                  />
+                  <Text type="secondary">
+                    Check back soon for upcoming tournaments!
+                  </Text>
+                </Card>
+              ) : (
+                <Row gutter={[24, 24]}>
+                  {tournaments.map((tournament) => (
+                    <Col key={tournament.id} xs={24} sm={24} md={12} lg={8}>
+                      <TournamentCard tournament={tournament} />
+                    </Col>
+                  ))}
+                </Row>
+              )}
+            </Spin>
+          </div>
+        </div>
+      </Content>
+    </Layout>
   );
 }

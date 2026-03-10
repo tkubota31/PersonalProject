@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { Form, Input, Button, Typography, message as antMessage } from "antd";
+import apiClient from "../api/client";
 
 const { Title } = Typography;
 
@@ -24,8 +24,8 @@ export default function RegisterTeam() {
       ...values,
     };
 
-    axios
-      .post("http://127.0.0.1:8000/api/registrations/", formData)
+    apiClient
+      .post("/registrations/", formData)
       .then(() => {
         antMessage.success("Registration submitted successfully!");
         setTimeout(() => navigate(`/tournaments/${id}`), 1500);

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import axios from "axios";
 import { Typography, Button, Spin, Divider, Empty } from "antd";
 import RegisteredTeams from "../components/RegisteredTeams";
+import apiClient from "../api/client";
 
 const { Title, Text } = Typography;
 
@@ -36,13 +36,13 @@ export default function TournamentDetail() {
   useEffect(() => {
     if (!id) return;
     setLoading(true);
-    axios
-      .get<Tournament>(`http://127.0.0.1:8000/api/tournaments/${id}/`)
+    apiClient
+      .get<Tournament>(`/tournaments/${id}/`)
       .then((res) => {
         setTournament(res.data);
         // Fetch registrations after tournament is loaded
-        return axios.get<Registration[]>(
-          `http://127.0.0.1:8000/api/tournaments/${id}/registrations/`,
+        return apiClient.get<Registration[]>(
+          `/tournaments/${id}/registrations/`,
         );
       })
       .then((res) => {
