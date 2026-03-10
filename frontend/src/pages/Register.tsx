@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Form, Input, Button, Card, message, Typography } from 'antd';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import React, { useState } from "react";
+import { Form, Input, Button, Card, message, Typography } from "antd";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const { Title } = Typography;
 
@@ -19,13 +19,18 @@ const Register: React.FC = () => {
   }) => {
     setLoading(true);
     try {
-      await register(values.username, values.email, values.password, values.passwordConfirm);
-      message.success('Registration successful! Redirecting to login...');
+      await register(
+        values.username,
+        values.email,
+        values.password,
+        values.passwordConfirm,
+      );
+      message.success("Registration successful! Redirecting to login...");
       setTimeout(() => {
-        navigate('/login');
+        navigate("/login");
       }, 1500);
     } catch (error: any) {
-      const errorMessage = error.message || 'Registration failed';
+      const errorMessage = error.message || "Registration failed";
       message.error(errorMessage);
     } finally {
       setLoading(false);
@@ -33,9 +38,17 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: '#f5f5f5' }}>
-      <Card style={{ width: 400, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-        <Title level={2} style={{ textAlign: 'center', marginBottom: 30 }}>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        minHeight: "100vh",
+        backgroundColor: "#f5f5f5",
+      }}
+    >
+      <Card style={{ width: 400, boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}>
+        <Title level={2} style={{ textAlign: "center", marginBottom: 30 }}>
           Register
         </Title>
         <Form
@@ -48,8 +61,8 @@ const Register: React.FC = () => {
             label="Username"
             name="username"
             rules={[
-              { required: true, message: 'Please input your username!' },
-              { min: 3, message: 'Username must be at least 3 characters' },
+              { required: true, message: "Please input your username!" },
+              { min: 3, message: "Username must be at least 3 characters" },
             ]}
           >
             <Input placeholder="Enter your username" />
@@ -59,8 +72,8 @@ const Register: React.FC = () => {
             label="Email"
             name="email"
             rules={[
-              { required: true, message: 'Please input your email!' },
-              { type: 'email', message: 'Please enter a valid email' },
+              { required: true, message: "Please input your email!" },
+              { type: "email", message: "Please enter a valid email" },
             ]}
           >
             <Input type="email" placeholder="Enter your email" />
@@ -70,8 +83,8 @@ const Register: React.FC = () => {
             label="Password"
             name="password"
             rules={[
-              { required: true, message: 'Please input your password!' },
-              { min: 6, message: 'Password must be at least 6 characters' },
+              { required: true, message: "Please input your password!" },
+              { min: 6, message: "Password must be at least 6 characters" },
             ]}
           >
             <Input.Password placeholder="Enter your password" />
@@ -81,13 +94,13 @@ const Register: React.FC = () => {
             label="Confirm Password"
             name="passwordConfirm"
             rules={[
-              { required: true, message: 'Please confirm your password!' },
+              { required: true, message: "Please confirm your password!" },
               ({ getFieldValue }) => ({
                 validator(_, value) {
-                  if (!value || getFieldValue('password') === value) {
+                  if (!value || getFieldValue("password") === value) {
                     return Promise.resolve();
                   }
-                  return Promise.reject(new Error('Passwords do not match!'));
+                  return Promise.reject(new Error("Passwords do not match!"));
                 },
               }),
             ]}
@@ -101,7 +114,7 @@ const Register: React.FC = () => {
             </Button>
           </Form.Item>
 
-          <div style={{ textAlign: 'center' }}>
+          <div style={{ textAlign: "center" }}>
             Already have an account? <Link to="/login">Login here</Link>
           </div>
         </Form>

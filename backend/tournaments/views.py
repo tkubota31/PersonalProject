@@ -60,7 +60,7 @@ class RegisterView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        
+
         # Generate tokens for the new user
         refresh = RefreshToken.for_user(user)
         return Response({
@@ -77,18 +77,18 @@ class LoginView(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        
+
         username = serializer.validated_data['username']
         password = serializer.validated_data['password']
-        
+
         user = authenticate(username=username, password=password)
-        
+
         if user is None:
             return Response(
                 {'detail': 'Invalid credentials.'},
                 status=status.HTTP_401_UNAUTHORIZED
             )
-        
+
         refresh = RefreshToken.for_user(user)
         return Response({
             'user': UserSerializer(user).data,

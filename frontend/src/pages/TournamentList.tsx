@@ -1,6 +1,21 @@
 import { useEffect, useState } from "react";
-import { Row, Col, Card, Empty, Spin, Space, Button, Typography, Layout } from "antd";
-import { TrophyOutlined, LogoutOutlined, LoginOutlined, UserAddOutlined } from "@ant-design/icons";
+import {
+  Row,
+  Col,
+  Card,
+  Empty,
+  Spin,
+  Space,
+  Button,
+  Typography,
+  Layout,
+} from "antd";
+import {
+  TrophyOutlined,
+  LogoutOutlined,
+  LoginOutlined,
+  UserAddOutlined,
+} from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import TournamentCard from "../components/TournamentCard";
 import { useAuth } from "../context/AuthContext";
@@ -41,7 +56,7 @@ export default function TournamentList() {
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate("/");
   };
 
   return (
@@ -77,13 +92,13 @@ export default function TournamentList() {
               <Button
                 type="primary"
                 icon={<LoginOutlined />}
-                onClick={() => navigate('/login')}
+                onClick={() => navigate("/login")}
               >
                 Login
               </Button>
               <Button
                 icon={<UserAddOutlined />}
-                onClick={() => navigate('/register')}
+                onClick={() => navigate("/register")}
               >
                 Register
               </Button>
@@ -91,7 +106,13 @@ export default function TournamentList() {
           )}
         </Space>
       </Header>
-      <Content style={{ background: "#f5f5f5", padding: "24px", minHeight: "calc(100vh - 64px)" }}>
+      <Content
+        style={{
+          background: "#f5f5f5",
+          padding: "24px",
+          minHeight: "calc(100vh - 64px)",
+        }}
+      >
         <div
           style={{
             background: "#f5f5f5",
@@ -102,7 +123,9 @@ export default function TournamentList() {
             <div style={{ marginBottom: "40px" }}>
               <Space orientation="vertical" style={{ width: "100%" }}>
                 <Space style={{ alignItems: "center" }}>
-                  <TrophyOutlined style={{ fontSize: "32px", color: "#1890ff" }} />
+                  <TrophyOutlined
+                    style={{ fontSize: "32px", color: "#1890ff" }}
+                  />
                   <Title level={1} style={{ margin: 0 }}>
                     Upcoming Volleyball Tournaments
                   </Title>
