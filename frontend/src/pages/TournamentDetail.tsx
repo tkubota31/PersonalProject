@@ -41,7 +41,9 @@ export default function TournamentDetail() {
   const { isAuthenticated } = useAuth();
   const [tournament, setTournament] = useState<Tournament | null>(null);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
-  const [myRegistration, setMyRegistration] = useState<Registration | null>(null);
+  const [myRegistration, setMyRegistration] = useState<Registration | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -98,7 +100,7 @@ export default function TournamentDetail() {
       <Text strong>Registration Deadline: </Text>
       {new Date(tournament.registration_deadline).toLocaleString()}
       <br />
-      
+
       {myRegistration ? (
         <Link to={`/registrations/${myRegistration.id}/edit`}>
           <Button type="primary" style={{ marginTop: 16 }} size="large" block>

@@ -47,37 +47,44 @@ export default function RegisteredTeams({
               {new Date(registration.created_at).toLocaleDateString()}
             </Text>
 
-            {registration.team_members && registration.team_members.length > 0 && (
-              <Collapse
-                items={[
-                  {
-                    key: `team-${registration.id}`,
-                    label: `Team Members (${registration.team_members.length})`,
-                    children: (
-                      <List
-                        dataSource={registration.team_members}
-                        renderItem={(member) => (
-                          <List.Item style={{ paddingLeft: "0" }}>
-                            <div>
-                              <Text>{member.name}</Text>
-                              {member.is_captain && (
-                                <Text type="success" style={{ marginLeft: "8px" }}>
-                                  (Captain)
+            {registration.team_members &&
+              registration.team_members.length > 0 && (
+                <Collapse
+                  items={[
+                    {
+                      key: `team-${registration.id}`,
+                      label: `Team Members (${registration.team_members.length})`,
+                      children: (
+                        <List
+                          dataSource={registration.team_members}
+                          renderItem={(member) => (
+                            <List.Item style={{ paddingLeft: "0" }}>
+                              <div>
+                                <Text>{member.name}</Text>
+                                {member.is_captain && (
+                                  <Text
+                                    type="success"
+                                    style={{ marginLeft: "8px" }}
+                                  >
+                                    (Captain)
+                                  </Text>
+                                )}
+                                <br />
+                                <Text
+                                  type="secondary"
+                                  style={{ fontSize: "12px" }}
+                                >
+                                  {member.email}
                                 </Text>
-                              )}
-                              <br />
-                              <Text type="secondary" style={{ fontSize: "12px" }}>
-                                {member.email}
-                              </Text>
-                            </div>
-                          </List.Item>
-                        )}
-                      />
-                    ),
-                  },
-                ]}
-              />
-            )}
+                              </div>
+                            </List.Item>
+                          )}
+                        />
+                      ),
+                    },
+                  ]}
+                />
+              )}
           </div>
         </List.Item>
       )}

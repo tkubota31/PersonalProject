@@ -1,5 +1,14 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { Form, Input, Button, Typography, message as antMessage, Spin, Checkbox, Empty } from "antd";
+import {
+  Form,
+  Input,
+  Button,
+  Typography,
+  message as antMessage,
+  Spin,
+  Checkbox,
+  Empty,
+} from "antd";
 import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import apiClient from "../api/client";
 import { useAuth } from "../context/AuthContext";
@@ -60,7 +69,10 @@ export default function EditRegistration() {
         });
       })
       .catch((err) => {
-        const errorMsg = err.response?.status === 403 ? "You don't have permission to edit this registration." : "Error loading registration.";
+        const errorMsg =
+          err.response?.status === 403
+            ? "You don't have permission to edit this registration."
+            : "Error loading registration.";
         antMessage.error(errorMsg);
         navigate("/");
       })
@@ -88,7 +100,9 @@ export default function EditRegistration() {
         }, 1500);
       })
       .catch((err) => {
-        const errorMsg = err.response?.data?.detail || "Error updating registration. Please try again.";
+        const errorMsg =
+          err.response?.data?.detail ||
+          "Error updating registration. Please try again.";
         antMessage.error(errorMsg);
       })
       .finally(() => setSubmitting(false));
@@ -104,7 +118,14 @@ export default function EditRegistration() {
 
   if (!registration) {
     return (
-      <div style={{ padding: "40px 20px", maxWidth: "600px", margin: "0 auto", textAlign: "center" }}>
+      <div
+        style={{
+          padding: "40px 20px",
+          maxWidth: "600px",
+          margin: "0 auto",
+          textAlign: "center",
+        }}
+      >
         <Title level={2}>Registration Not Found</Title>
         <Button type="primary" onClick={() => navigate("/")}>
           Back to Tournaments
@@ -205,7 +226,11 @@ export default function EditRegistration() {
                         ]}
                         style={{ marginBottom: "8px" }}
                       >
-                        <Input placeholder="Member email" size="large" type="email" />
+                        <Input
+                          placeholder="Member email"
+                          size="large"
+                          type="email"
+                        />
                       </Form.Item>
 
                       <Form.Item
@@ -220,7 +245,11 @@ export default function EditRegistration() {
 
                     <MinusCircleOutlined
                       onClick={() => remove(field.name)}
-                      style={{ marginTop: "8px", cursor: "pointer", color: "red" }}
+                      style={{
+                        marginTop: "8px",
+                        cursor: "pointer",
+                        color: "red",
+                      }}
                     />
                   </div>
                 ))}
@@ -242,10 +271,10 @@ export default function EditRegistration() {
         </Form.Item>
 
         <Form.Item>
-          <Button 
-            type="primary" 
-            size="large" 
-            block 
+          <Button
+            type="primary"
+            size="large"
+            block
             htmlType="submit"
             loading={submitting}
           >

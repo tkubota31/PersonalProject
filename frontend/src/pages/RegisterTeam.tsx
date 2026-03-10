@@ -1,5 +1,14 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { Form, Input, Button, Typography, message as antMessage, Space, Checkbox, Empty } from "antd";
+import {
+  Form,
+  Input,
+  Button,
+  Typography,
+  message as antMessage,
+  Space,
+  Checkbox,
+  Empty,
+} from "antd";
 import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import apiClient from "../api/client";
@@ -39,7 +48,8 @@ export default function RegisterTeam() {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const { isAuthenticated } = useAuth();
-  const [existingRegistration, setExistingRegistration] = useState<ExistingRegistration | null>(null);
+  const [existingRegistration, setExistingRegistration] =
+    useState<ExistingRegistration | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -88,7 +98,9 @@ export default function RegisterTeam() {
 
   if (existingRegistration) {
     return (
-      <div style={{ padding: "40px 20px", maxWidth: "600px", margin: "0 auto" }}>
+      <div
+        style={{ padding: "40px 20px", maxWidth: "600px", margin: "0 auto" }}
+      >
         <Title level={2}>Your Registration</Title>
         <Typography.Paragraph>
           You have already registered for this tournament.
@@ -96,7 +108,9 @@ export default function RegisterTeam() {
         <Button
           type="primary"
           size="large"
-          onClick={() => navigate(`/registrations/${existingRegistration.id}/edit`)}
+          onClick={() =>
+            navigate(`/registrations/${existingRegistration.id}/edit`)
+          }
           style={{ marginRight: "10px" }}
         >
           Edit Registration
@@ -122,7 +136,9 @@ export default function RegisterTeam() {
         setTimeout(() => navigate(`/tournaments/${id}`), 1500);
       })
       .catch((err) => {
-        const errorMsg = err.response?.data?.detail || "Error submitting registration. Please try again.";
+        const errorMsg =
+          err.response?.data?.detail ||
+          "Error submitting registration. Please try again.";
         antMessage.error(errorMsg);
       });
   };
@@ -219,7 +235,11 @@ export default function RegisterTeam() {
                         ]}
                         style={{ marginBottom: "8px" }}
                       >
-                        <Input placeholder="Member email" size="large" type="email" />
+                        <Input
+                          placeholder="Member email"
+                          size="large"
+                          type="email"
+                        />
                       </Form.Item>
 
                       <Form.Item
@@ -234,7 +254,11 @@ export default function RegisterTeam() {
 
                     <MinusCircleOutlined
                       onClick={() => remove(field.name)}
-                      style={{ marginTop: "8px", cursor: "pointer", color: "red" }}
+                      style={{
+                        marginTop: "8px",
+                        cursor: "pointer",
+                        color: "red",
+                      }}
                     />
                   </div>
                 ))}

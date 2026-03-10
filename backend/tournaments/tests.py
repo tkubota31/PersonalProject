@@ -10,14 +10,14 @@ from datetime import timedelta
 class TeamMemberRegistrationTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
-        
+
         # Create test user
         self.user = User.objects.create_user(
             username='testuser',
             email='test@example.com',
             password='testpass123'
         )
-        
+
         # Create tournament
         self.tournament = Tournament.objects.create(
             name='Test Tournament',
@@ -43,17 +43,17 @@ class TeamMemberRegistrationTestCase(TestCase):
                 {'name': 'Player 2', 'email': 'player2@example.com', 'is_captain': True},
             ]
         }
-        
+
         self.client.force_authenticate(user=self.user)
         response = self.client.post('/api/registrations/', data, format='json')
-        
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Registration.objects.count(), 1)
-        
+
         registration = Registration.objects.first()
         self.assertEqual(registration.user, self.user)
         self.assertEqual(registration.team_members.count(), 2)
-        
+
         # Check team members
         captain_member = registration.team_members.filter(is_captain=True).first()
         self.assertIsNotNone(captain_member)
@@ -72,10 +72,10 @@ class TeamMemberRegistrationTestCase(TestCase):
                 for i in range(11)
             ]
         }
-        
+
         self.client.force_authenticate(user=self.user)
         response = self.client.post('/api/registrations/', data, format='json')
-        
+
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('team_members', response.data)
 
@@ -92,10 +92,10 @@ class TeamMemberRegistrationTestCase(TestCase):
                 {'name': 'Player 2', 'email': 'player2@example.com', 'is_captain': True},
             ]
         }
-        
+
         self.client.force_authenticate(user=self.user)
         response = self.client.post('/api/registrations/', data, format='json')
-        
+
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('team_members', response.data)
 
@@ -110,17 +110,17 @@ class TeamMemberRegistrationTestCase(TestCase):
             captain_email='captain@example.com',
             captain_phone='1234567890'
         )
-        
+
         TeamMember.objects.create(
             registration=registration,
             name='Player 1',
             email='player1@example.com',
             is_captain=False
         )
-        
+
         self.client.force_authenticate(user=self.user)
         response = self.client.get(f'/api/registrations/{registration.id}/')
-        
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['team_members']), 1)
         self.assertEqual(response.data['team_members'][0]['name'], 'Player 1')
@@ -136,14 +136,14 @@ class TeamMemberRegistrationTestCase(TestCase):
             captain_email='captain@example.com',
             captain_phone='1234567890'
         )
-        
+
         TeamMember.objects.create(
             registration=registration,
             name='Player 1',
             email='player1@example.com',
             is_captain=False
         )
-        
+
         # Update with new members
         data = {
             'team_members': [
@@ -151,12 +151,12 @@ class TeamMemberRegistrationTestCase(TestCase):
                 {'name': 'New Player 2', 'email': 'newplayer2@example.com', 'is_captain': True},
             ]
         }
-        
+
         self.client.force_authenticate(user=self.user)
         response = self.client.patch(f'/api/registrations/{registration.id}/', data, format='json')
-        
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        
+
         # Verify members were replaced
         registration.refresh_from_db()
         self.assertEqual(registration.team_members.count(), 2)
@@ -170,7 +170,7 @@ class TeamMemberRegistrationTestCase(TestCase):
             email='other@example.com',
             password='testpass123'
         )
-        
+
         # Create registration as first user
         registration = Registration.objects.create(
             tournament=self.tournament,
@@ -180,13 +180,13 @@ class TeamMemberRegistrationTestCase(TestCase):
             captain_email='captain@example.com',
             captain_phone='1234567890'
         )
-        
+
         # Try to update as different user
         data = {'team_name': 'Updated Team'}
-        
+
         self.client.force_authenticate(user=other_user)
         response = self.client.patch(f'/api/registrations/{registration.id}/', data, format='json')
-        
+
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_my_registrations_view(self):
@@ -200,14 +200,14 @@ class TeamMemberRegistrationTestCase(TestCase):
             captain_email='captain@example.com',
             captain_phone='1234567890'
         )
-        
+
         # Create registration as different user
         other_user = User.objects.create_user(
             username='otheruser',
             email='other@example.com',
             password='testpass123'
         )
-        
+
         Registration.objects.create(
             tournament=self.tournament,
             user=other_user,
@@ -216,11 +216,11 @@ class TeamMemberRegistrationTestCase(TestCase):
             captain_email='othercaptain@example.com',
             captain_phone='0987654321'
         )
-        
+
         # Get my registrations
         self.client.force_authenticate(user=self.user)
         response = self.client.get('/api/registrations/my/')
-        
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]['team_name'], 'Test Team')
@@ -238,7 +238,7 @@ class TeamMemberRegistrationTestCase(TestCase):
             fee=100.00,
             created_by=self.user
         )
-        
+
         # Create registrations for both tournaments
         Registration.objects.create(
             tournament=self.tournament,
@@ -248,7 +248,7 @@ class TeamMemberRegistrationTestCase(TestCase):
             captain_email='captain@example.com',
             captain_phone='1234567890'
         )
-        
+
         Registration.objects.create(
             tournament=tournament2,
             user=self.user,
@@ -257,11 +257,11 @@ class TeamMemberRegistrationTestCase(TestCase):
             captain_email='captain@example.com',
             captain_phone='1234567890'
         )
-        
+
         # Get my registrations for first tournament
         self.client.force_authenticate(user=self.user)
         response = self.client.get(f'/api/registrations/my/?tournament={self.tournament.id}')
-        
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]['team_name'], 'Test Team 1')

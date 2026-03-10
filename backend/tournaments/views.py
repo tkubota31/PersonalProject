@@ -15,7 +15,7 @@ from .serializers import (
 
 class IsRegistrationOwnerOrReadOnly(BasePermission):
     """Permission to allow registration owner to edit/delete, read-only for others."""
-    
+
     def has_object_permission(self, request, view, obj):
         # Read permissions are allowed to any access
         if request.method in ['GET', 'HEAD', 'OPTIONS']:
