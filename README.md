@@ -48,7 +48,7 @@ PersonalProject/
 │   │   ├── admin.py
 │   │   └── tests.py
 │   ├── db.sqlite3               # SQLite database (development)
-│   └── requirements.txt         # Python dependencies (if present)
+│   └── requirements.txt         # Python dependencies
 └── frontend/
     ├── src/
     │   ├── main.tsx             # React entry point
@@ -72,19 +72,19 @@ PersonalProject/
 
 ### Backend Setup
 
-1. **Create Python Virtual Environment**
+1. **Create Python Virtual Environment (macOS)**
 
 ```bash
 cd backend
 python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate
 ```
 
 2. **Install Dependencies**
 
 ```bash
-pip install django djangorestframework django-cors-headers
-# or install from requirements.txt if available
+python3 -m pip install --upgrade pip
+python -m pip install -r requirements.txt
 ```
 
 3. **Apply Migrations**
@@ -99,7 +99,15 @@ python manage.py migrate
 python manage.py runserver
 ```
 
+If you are in the project root (`PersonalProject/`) instead of `backend/`, run:
+
+```bash
+python backend/manage.py runserver
+```
+
 The backend will run on `http://localhost:8000`. API endpoints are under `/api/` and use standard Django routing.
+
+To stop the backend server, press `Ctrl + C` in the terminal.
 
 (Optional) You can create a superuser to access the admin panel:
 
@@ -128,6 +136,26 @@ npm run dev
 ```
 
 The frontend will run on `http://localhost:5173`
+
+### Start Both Servers With One Command (macOS)
+
+From the project root:
+
+```bash
+chmod +x scripts/start-dev.sh scripts/stop-dev.sh
+./scripts/start-dev.sh
+```
+
+To stop both:
+
+```bash
+./scripts/stop-dev.sh
+```
+
+The scripts write logs to:
+
+- `.dev-logs/backend.log`
+- `.dev-logs/frontend.log`
 
 ## API Endpoints
 
@@ -210,13 +238,33 @@ The frontend will run on `http://localhost:5173`
 
 - Ensure Python 3.8+ is installed
 - Check that virtual environment is activated
-- Verify all dependencies are installed: `pip install -r requirements.txt`
+- Verify all dependencies are installed: `python -m pip install -r requirements.txt`
+- If JWT-related imports fail, reinstall dependencies from `requirements.txt`.
+- If you get `ModuleNotFoundError: No module named 'django'`, recreate the backend virtual environment and reinstall:
+
+```bash
+cd backend
+rm -rf venv
+python3 -m venv venv
+source venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+- If you get `can't open file .../manage.py`, you are in the wrong folder. Either `cd backend` first, or run `python backend/manage.py runserver` from the project root.
 
 ### Frontend won't connect to backend
 
 - Verify backend is running on port 8000
-- Check CORS settings in `backend/main.py`
+- Check CORS settings in `backend/config/settings.py`
 - Ensure `.env` has correct API URL: `VITE_API_URL=http://localhost:8000`
+- If Vite fails with a Node version error (for example, requiring Node 20.19+ or 22.12+), use a newer Node version with nvm:
+
+```bash
+nvm use 22.12.0
+```
+
+- If startup scripts report a port already in use (`8000` or `5173`), stop existing processes first, then rerun `./scripts/start-dev.sh`.
 
 ### Database errors
 
