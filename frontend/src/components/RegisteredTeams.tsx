@@ -56,7 +56,9 @@ export default function RegisteredTeams({
                       label: `Team Members (${registration.team_members.length})`,
                       children: (
                         <List
-                          dataSource={registration.team_members}
+                          dataSource={[...registration.team_members].sort(
+                            (a, b) => Number(b.is_captain) - Number(a.is_captain)
+                          )}
                           renderItem={(member) => (
                             <List.Item style={{ paddingLeft: "0" }}>
                               <div>
@@ -70,12 +72,6 @@ export default function RegisteredTeams({
                                   </Text>
                                 )}
                                 <br />
-                                <Text
-                                  type="secondary"
-                                  style={{ fontSize: "12px" }}
-                                >
-                                  {member.email}
-                                </Text>
                               </div>
                             </List.Item>
                           )}
