@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   Form,
   Input,
@@ -135,7 +135,12 @@ export default function EditRegistration() {
   }
 
   return (
-    <div style={{ padding: "40px 20px", maxWidth: "600px", margin: "0 auto" }}>
+    <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
+      <Link to={`/tournaments/${registration.tournament}`}>
+        <Button style={{ marginBottom: 16 }}>
+          ← Back to Tournament Details
+        </Button>
+      </Link>
       <Title level={2}>Edit Team Registration</Title>
       <Form
         form={form}
@@ -194,7 +199,7 @@ export default function EditRegistration() {
                     style={{ marginBottom: "20px" }}
                   />
                 ) : null}
-                {fields.map((field, idx) => (
+                {fields.map((field) => (
                   <div
                     key={field.key}
                     style={{
